@@ -158,6 +158,12 @@ export default function PublicProfilePage() {
                 businessName={profile.businessName} 
                 price={profile.price} 
                 userId={username as string} 
+                onBuyTrigger={(leadId) => {
+                  // Redirect to payment or capture final lead data
+                  console.log("Triggering Buy for Lead:", leadId);
+                  alert("Redirecting to secure checkout...");
+                  // Example: window.location.href = `/api/pay?leadId=${leadId}&amount=${profile.price}`;
+                }}
               />
             </div>
           )}

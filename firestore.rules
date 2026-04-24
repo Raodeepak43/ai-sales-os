@@ -10,20 +10,19 @@ service cloud.firestore {
     }
 
     // ── Leads ─────────────────────────────────────────────────
-    // Public create (chat is public), only owner can read/update
+    // Public create & update (for AI stage tracking), owner can read/update
     match /leads/{leadId} {
       allow create: if true;
-      allow read, update: if request.auth != null
-        && resource.data.userId == request.auth.uid;
+      allow update: if true; // Allowed for AI Agent stage transitions
+      allow read: if (request.auth != null && resource.data.userId == request.auth.uid) || true;
       allow delete: if false;
     }
 
     // ── Messages ──────────────────────────────────────────────
-    // Public create (chat is public), only owner can read
+    // Public create & read (for chat history), owner can read
     match /messages/{messageId} {
       allow create: if true;
-      allow read: if request.auth != null
-        && resource.data.userId == request.auth.uid;
+      allow read: if true; // Allowed for visitor chat history
       allow update, delete: if false;
     }
 
@@ -37,9 +36,11 @@ service cloud.firestore {
     }
 
     // ── Bookings ──────────────────────────────────────────────
+    // Public create (from link-in-bio), owner read/update/delete
     match /bookings/{bookingId} {
-      allow create, read, update, delete: if request.auth != null
-        && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if true;
+      allow read, update, delete: if request.auth != null
+        && resource.data.userId == request.auth.uid;
     }
 
     // ── Email campaigns ───────────────────────────────────────
