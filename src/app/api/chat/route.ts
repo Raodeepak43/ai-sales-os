@@ -257,9 +257,9 @@ export async function POST(req: Request) {
       model: "llama-3.3-70b-versatile",
       messages: [
         { role: "system", content: systemPrompt },
-        ...history.slice(-12), // keep last 12 messages for context window efficiency
+        ...(history.slice(-12) as any), // keep last 12 messages for context window efficiency
         { role: "user", content: message },
-      ],
+      ] as any,
       max_tokens: 120, // enforce short replies
       temperature: 0.65,
     });
