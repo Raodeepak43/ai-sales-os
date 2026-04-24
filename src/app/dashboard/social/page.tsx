@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { db } from "@/lib/firebase";
 import { collection, query, where, addDoc, getDocs, updateDoc, doc, serverTimestamp } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { Zap, Plus, Send, MessageSquare, Heart, AtSign, Loader2, ToggleLeft, ToggleRight, Bell, Globe, Facebook } from "lucide-react";
+import { Zap, Plus, Send, MessageSquare, Heart, AtSign, Loader2, ToggleLeft, ToggleRight, Bell, Globe, Share2 } from "lucide-react";
 
 interface AutoReply {
   id: string;
@@ -162,7 +162,7 @@ export default function SocialPage() {
             Setup Guide
           </button>
           <div className="flex -space-x-2">
-            {[Heart, Facebook, AtSign].map((Icon, i) => (
+            {[Heart, Share2, AtSign].map((Icon, i) => (
               <div key={i} className="w-8 h-8 rounded-full bg-white/20 border-2 border-blue-600 flex items-center justify-center">
                 <Icon className="w-3.5 h-3.5 text-white" />
               </div>

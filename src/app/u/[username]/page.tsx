@@ -7,7 +7,7 @@ import { doc, getDoc, collection, query, where, getDocs } from "firebase/firesto
 import ChatInterface from "@/components/ChatInterface";
 import { 
   MessageSquare, Calendar, BookOpen, Mail, 
-  Heart, AtSign, Facebook, Globe,
+  Heart, AtSign, Globe,
   ShieldCheck, ArrowRight, Star
 } from "lucide-react";
 
