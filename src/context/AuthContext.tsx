@@ -94,24 +94,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       // Use redirect for mobile/social apps to avoid popup blocks
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      const isSocialApp = /FBAN|FBAV|Instagram|Twitter|Threads/i.test(navigator.userAgent);
+      const isSocialApp = /FBAN|FBAV|Instagram|Twitter|Threads|Snapchat/i.test(navigator.userAgent);
 
       if (isMobile || isSocialApp) {
         return await signInWithRedirect(auth, provider);
       } else {
-        // For desktop, popup is better but can be blocked
+        // For desktop, try popup but fall back to redirect on ANY error
         try {
           return await signInWithPopup(auth, provider);
         } catch (popupError: any) {
-          if (popupError.code === 'auth/popup-blocked' || popupError.code === 'auth/cancelled-popup-request') {
-            return await signInWithRedirect(auth, provider);
-          }
-          throw popupError;
+          console.warn("Auth Popup failed, falling back to redirect:", popupError.code);
+          return await signInWithRedirect(auth, provider);
         }
       }
     } catch (error: any) {
       console.error("Google Sign In Error:", error);
-      throw error;
+      // Final fallback attempt
+      try {
+        return await signInWithRedirect(auth, provider);
+      } catch (e) {
+        throw error;
+      }
     }
   };
 
