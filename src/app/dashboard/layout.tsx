@@ -73,7 +73,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   useEffect(() => {
     async function checkOnboarding() {
-      if (!user) return;
+      if (!user) {
+        setChecking(false);
+        return;
+      }
       if (pathname === "/dashboard/onboarding") { setChecking(false); return; }
       try {
         const docSnap = await getDoc(doc(db, "users", user.uid));

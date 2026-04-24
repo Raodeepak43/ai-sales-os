@@ -31,10 +31,7 @@ interface Course {
 
 export default function PublicProfilePage() {
   const { username } = useParams();
-  const [profile, setProfile] = useState<BusinessProfile | null>(null);
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [activeTab, setActiveTab] = useState<"chat" | "booking" | "courses" | "about">("chat");
-  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string>("");
 
   useEffect(() => {
     async function fetchData() {
@@ -44,11 +41,12 @@ export default function PublicProfilePage() {
       
       if (!userSnap.empty) {
         const userData = userSnap.docs[0].data() as BusinessProfile;
-        const userId = userSnap.docs[0].id;
+        const uid = userSnap.docs[0].id;
         setProfile(userData);
+        setUserId(uid);
 
         // Fetch Courses
-        const courseQuery = query(collection(db, "courses"), where("userId", "==", userId), where("published", "==", true));
+        const courseQuery = query(collection(db, "courses"), where("userId", "==", uid), where("published", "==", true));
         const courseSnap = await getDocs(courseQuery);
         setCourses(courseSnap.docs.map(d => ({ id: d.id, ...d.data() })) as Course[]);
       }
@@ -56,6 +54,81 @@ export default function PublicProfilePage() {
     }
     fetchData();
   }, [username]);
+
+  const loadRazorpay = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handlePayment = async (amount: string, leadId?: string) => {
+    try {
+      const res = await loadRazorpay();
+      if (!res) {
+        alert("Razorpay SDK failed to load. Are you online?");
+        return;
+      }
+
+      // 1. Create order
+      const orderRes = await fetch("/api/payment/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount, userId }),
+      });
+      const orderData = await orderRes.json();
+
+      if (orderData.error) throw new Error(orderData.error);
+
+      // 2. Open Razorpay
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_dummy",
+        amount: orderData.amount,
+        currency: "INR",
+        name: profile?.businessName || "AI Sales OS",
+        description: `Payment for ${profile?.businessName} services`,
+        order_id: orderData.orderId,
+        handler: async (response: any) => {
+          // 3. Verify payment
+          const verifyRes = await fetch("/api/payment/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              userId,
+              amount,
+            }),
+          });
+          const verifyData = await verifyRes.json();
+          if (verifyData.success) {
+            alert("Payment Successful! Thank you.");
+            setActiveTab("about");
+          } else {
+            alert("Payment verification failed.");
+          }
+        },
+        prefill: {
+          name: "",
+          email: "",
+          contact: "",
+        },
+        theme: {
+          color: "#2563EB",
+        },
+      };
+
+      const paymentObject = new (window as any).Razorpay(options);
+      paymentObject.open();
+    } catch (err: any) {
+      console.error("Payment Error:", err);
+      alert("Something went wrong with the payment.");
+    }
+  };
 
   if (loading) return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -157,13 +230,8 @@ export default function PublicProfilePage() {
               <ChatInterface 
                 businessName={profile.businessName} 
                 price={profile.price} 
-                userId={username as string} 
-                onBuyTrigger={(leadId) => {
-                  // Redirect to payment or capture final lead data
-                  console.log("Triggering Buy for Lead:", leadId);
-                  alert("Redirecting to secure checkout...");
-                  // Example: window.location.href = `/api/pay?leadId=${leadId}&amount=${profile.price}`;
-                }}
+                userId={userId} 
+                onBuyTrigger={(leadId) => handlePayment(profile.price, leadId)}
               />
             </div>
           )}
@@ -181,8 +249,11 @@ export default function PublicProfilePage() {
                     </button>
                   ))}
                 </div>
-                <button className="w-full max-w-sm mt-6 py-4 rounded-2xl bg-blue-600 text-white font-bold text-sm shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
-                  Check All Availability <ArrowRight className="w-4 h-4" />
+                <button 
+                  onClick={() => handlePayment(profile.price)}
+                  className="w-full max-w-sm mt-6 py-4 rounded-2xl bg-blue-600 text-white font-bold text-sm shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
+                >
+                  Book Session Now <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -209,8 +280,11 @@ export default function PublicProfilePage() {
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-bold text-blue-600 dark:text-blue-400">₹{course.price}</p>
-                      <button className="text-[10px] font-bold uppercase tracking-wider text-gray-400 group-hover:text-blue-600 flex items-center gap-1 mt-1 transition-colors">
-                        View <ArrowRight className="w-3 h-3" />
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); handlePayment(course.price); }}
+                        className="text-[10px] font-bold uppercase tracking-wider text-gray-400 group-hover:text-blue-600 flex items-center gap-1 mt-1 transition-colors"
+                      >
+                        Buy Now <ArrowRight className="w-3 h-3" />
                       </button>
                     </div>
                   </div>

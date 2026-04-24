@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 export async function POST(req: Request) {
   try {
@@ -7,9 +9,22 @@ export async function POST(req: Request) {
 
     const secret = process.env.RAZORPAY_KEY_SECRET;
 
-    if (!secret || secret === "dummy") {
-      // Mock mode success
-      return NextResponse.json({ success: true, message: "Mock payment verified" });
+    // Check if it's a mock payment
+    if ((!secret || secret === "dummy") && razorpay_order_id.startsWith("order_mock_")) {
+      // Mock mode success - save to DB
+      await addDoc(collection(db, "payments"), {
+        userId,
+        amount: Number(amount),
+        status: "success",
+        orderId: razorpay_order_id,
+        paymentId: "mock_payment_" + Date.now(),
+        timestamp: serverTimestamp(),
+      });
+      return NextResponse.json({ success: true, message: "Mock payment verified and saved" });
+    }
+
+    if (!secret) {
+      return NextResponse.json({ error: "Razorpay secret not configured" }, { status: 500 });
     }
 
     const generated_signature = crypto
@@ -18,9 +33,15 @@ export async function POST(req: Request) {
       .digest("hex");
 
     if (generated_signature === razorpay_signature) {
-      // Signature is valid
-      // Note: For a production app, you would use firebase-admin here to securely update the database:
-      // await adminDb.collection("payments").add({ userId, amount, status: "success", timestamp: admin.firestore.FieldValue.serverTimestamp() })
+      // Signature is valid - save to DB
+      await addDoc(collection(db, "payments"), {
+        userId,
+        amount: Number(amount),
+        status: "success",
+        orderId: razorpay_order_id,
+        paymentId: razorpay_payment_id,
+        timestamp: serverTimestamp(),
+      });
       
       return NextResponse.json({ success: true, message: "Payment verified successfully" });
     } else {
