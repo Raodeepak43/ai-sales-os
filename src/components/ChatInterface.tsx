@@ -25,9 +25,10 @@ interface BusinessContext {
 interface ChatInterfaceProps {
   userId: string;
   businessName: string;
-  aiTone: string;
-  onClose: () => void;
-  onBuyTrigger: (leadId?: string) => void;
+  price?: string;
+  aiTone?: string;
+  onClose?: () => void;
+  onBuyTrigger?: (leadId?: string) => void;
 }
 
 interface Message {
@@ -42,7 +43,14 @@ interface Message {
 // ═══════════════════════════════════════════════════════════
 const TYPING_DELAY_MS = 900; // simulated "AI is thinking" pause
 
-export default function ChatInterface({ userId, businessName, aiTone, onClose, onBuyTrigger }: ChatInterfaceProps) {
+export default function ChatInterface({ 
+  userId, 
+  businessName, 
+  price,
+  aiTone = "professional", 
+  onClose, 
+  onBuyTrigger 
+}: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "0",
@@ -70,17 +78,20 @@ export default function ChatInterface({ userId, businessName, aiTone, onClose, o
           setBusinessContext({
             businessName: d.businessName || businessName,
             serviceName: d.serviceName,
-            price: d.price,
+            price: price || d.price,
             aiTone: d.aiTone || aiTone,
             serviceDescription: d.serviceDescription,
             keyBenefits: d.keyBenefits,
             targetAudience: d.targetAudience,
           });
+        } else if (price) {
+           // Fallback for public hub where doc might be based on handle not UID
+           setBusinessContext(prev => ({ ...prev, price }));
         }
       } catch (_) { /* fallback to props */ }
     }
     fetchContext();
-  }, [userId, businessName, aiTone]);
+  }, [userId, businessName, aiTone, price]);
 
   // ── Auto scroll to bottom ────────────────────────────────
   useEffect(() => {
@@ -244,9 +255,11 @@ export default function ChatInterface({ userId, businessName, aiTone, onClose, o
           <span className="hidden sm:inline-flex items-center text-xs px-2 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium">
             {stageLabel[stage]}
           </span>
-          <button onClick={onClose} className="p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-            <X className="w-5 h-5" />
-          </button>
+          {onClose && (
+            <button onClick={onClose} className="p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -270,7 +283,7 @@ export default function ChatInterface({ userId, businessName, aiTone, onClose, o
               {/* Inline trigger buttons */}
               {msg.sender === "ai" && msg.trigger === "show_buy_button" && (
                 <button
-                  onClick={() => onBuyTrigger(leadId)}
+                  onClick={() => onBuyTrigger?.(leadId)}
                   className="flex items-center justify-center gap-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-violet-600 py-2.5 px-4 rounded-xl shadow-md hover:opacity-90 transition-opacity"
                 >
                   <CreditCard className="w-4 h-4" />
@@ -279,7 +292,7 @@ export default function ChatInterface({ userId, businessName, aiTone, onClose, o
               )}
               {msg.sender === "ai" && msg.trigger === "show_payment_link" && (
                 <button
-                  onClick={() => onBuyTrigger(leadId)}
+                  onClick={() => onBuyTrigger?.(leadId)}
                   className="flex items-center justify-center gap-2 text-sm font-semibold text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 py-2.5 px-4 rounded-xl hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors"
                 >
                   <ShieldCheck className="w-4 h-4" />
