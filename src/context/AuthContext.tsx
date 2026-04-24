@@ -26,6 +26,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Handle redirect results for mobile users
+    const { getRedirectResult } = require("firebase/auth");
+    getRedirectResult(auth).catch((err: any) => console.error("Redirect Result Error:", err));
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       
@@ -59,9 +63,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      // Using redirect for better mobile compatibility in social app browsers
-      const { signInWithRedirect } = await import("firebase/auth");
-      await signInWithRedirect(auth, provider);
+      
+      // Smart Auth: Use Popup on Desktop, Redirect on Mobile/Social
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const isSocialApp = /FBAN|FBAV|Instagram/i.test(navigator.userAgent);
+
+      if (isMobile || isSocialApp) {
+        const { signInWithRedirect } = await import("firebase/auth");
+        await signInWithRedirect(auth, provider);
+      } else {
+        await signInWithPopup(auth, provider);
+      }
     } catch (error) {
       console.error("Error signing in with Google", error);
       throw error;
