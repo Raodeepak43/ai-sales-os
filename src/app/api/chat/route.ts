@@ -256,13 +256,13 @@ export async function POST(req: Request) {
     const completion = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       messages: [
-        { role: "system", content: systemPrompt },
-        ...(history.slice(-12) as any), // keep last 12 messages for context window efficiency
-        { role: "user", content: message },
+        { role: "system" as const, content: systemPrompt },
+        ...(history.slice(-12) as any),
+        { role: "user" as const, content: message },
       ] as any,
       max_tokens: 120, // enforce short replies
       temperature: 0.65,
-    });
+    } as any);
 
     const reply = completion.choices[0]?.message?.content?.trim() || "Tell me more about what you're looking for!";
 
