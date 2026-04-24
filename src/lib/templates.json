@@ -1,0 +1,42 @@
+[
+  {
+    "id": "coaching",
+    "name": "Expert Coach",
+    "description": "Optimized for life coaches and mentors.",
+    "aiTone": "empathetic",
+    "price": "4999",
+    "serviceDescription": "1-on-1 coaching sessions designed to unlock your full potential.",
+    "keyBenefits": "Clear goal setting, weekly accountability, private community access.",
+    "targetAudience": "Entrepreneurs and high-performers."
+  },
+  {
+    "id": "fitness",
+    "name": "Fitness Trainer",
+    "description": "Optimized for personal trainers and gyms.",
+    "aiTone": "bold",
+    "price": "2999",
+    "serviceDescription": "Customized workout plans and nutrition tracking.",
+    "keyBenefits": "Guaranteed results, 24/7 support, mobile app access.",
+    "targetAudience": "Fitness enthusiasts."
+  },
+  {
+    "id": "real-estate",
+    "name": "Real Estate Pro",
+    "description": "Optimized for property dealers and agents.",
+    "aiTone": "professional",
+    "price": "0",
+    "serviceDescription": "Helping you find your dream home with zero hassle.",
+    "keyBenefits": "Exclusive listings, market analysis, verified properties.",
+    "targetAudience": "Home buyers."
+  },
+  {
+    "id": "agency",
+    "name": "Marketing Agency",
+    "description": "Optimized for service-based B2B agencies.",
+    "aiTone": "persuasive",
+    "price": "15000",
+    "serviceDescription": "Full-stack marketing solutions that scale your revenue.",
+    "keyBenefits": "ROI focused, weekly reports, dedicated account manager.",
+    "targetAudience": "E-commerce brands."
+  }
+]
