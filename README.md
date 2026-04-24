@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 AI Sales OS
 
-## Getting Started
+**The All-in-One AI Sales Engine for Modern Businesses.**
 
-First, run the development server:
+AI Sales OS is a production-ready SaaS platform designed to replace multiple tools with a single, high-converting AI engine. It automatically captures leads, handles objections, and closes sales using a sophisticated 3-layer AI architecture.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Key Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 🧠 Core Engine: AI Sales Agent
+- **3-Layer Architecture**: Rule Engine + Business Context + LLM (Groq/OpenAI).
+- **Stage Tracking**: Tracks leads from `new` to `converted`.
+- **Auto-Closing**: Detects buy-intent and serves payment links automatically.
+- **Inactivity Follow-ups**: Proactively re-engages cold leads.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 🛠️ Integrated Modules
+- **Booking System**: Mini-calendar for appointment scheduling.
+- **Email Marketing**: Campaign builder with subscriber management.
+- **Social Automation**: Auto-reply rules for Instagram, WhatsApp, and Twitter.
+- **Course Builder**: Create and sell video courses with access control.
+- **Link-in-Bio Store**: Custom public profile (`/u/[username]`) for your business.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Tech Stack
+- **Frontend**: Next.js 15 (App Router), Tailwind CSS
+- **Backend**: Firebase (Auth, Firestore)
+- **AI**: Groq (Llama-3.3-70b)
+- **Payments**: Razorpay
 
-## Learn More
+## 🚀 Quick Start
 
-To learn more about Next.js, take a look at the following resources:
+1. **Clone & Install**:
+   ```bash
+   git clone https://github.com/Raodeepak43/ai-sales-os.git
+   cd ai-sales-os
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. **Environment Variables**:
+   Create a `.env.local` with your Firebase, Groq, and Razorpay keys.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. **Run**:
+   ```bash
+   npm run dev
+   ```
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📄 License
+MIT License.
