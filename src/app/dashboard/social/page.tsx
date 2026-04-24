@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { db } from "@/lib/firebase";
 import { collection, query, where, addDoc, getDocs, updateDoc, doc, serverTimestamp } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { Zap, Plus, Send, MessageSquare, Heart, AtSign, Loader2, ToggleLeft, ToggleRight, Bell } from "lucide-react";
+import { Zap, Plus, Send, MessageSquare, Heart, AtSign, Loader2, ToggleLeft, ToggleRight, Bell, Globe, Facebook } from "lucide-react";
 
 interface AutoReply {
   id: string;
@@ -117,6 +117,58 @@ export default function SocialPage() {
             </p>
           </div>
         ))}
+      </div>
+
+      {/* Webhook Configuration (FOR INSTAGRAM/FACEBOOK DEPLOYMENT) */}
+      <div className="bg-gradient-to-br from-blue-600 to-violet-700 rounded-3xl p-6 text-white shadow-xl shadow-blue-500/20">
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="text-lg font-bold flex items-center gap-2">
+              <Globe className="w-5 h-5" />
+              Deploy AI to Social Platforms
+            </h2>
+            <p className="text-blue-100 text-sm mt-1 max-w-md">
+              Use these credentials in the Meta Developer Portal to link your AI Sales Closer to Instagram & Facebook DMs.
+            </p>
+          </div>
+          <div className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
+            Production Ready
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+            <p className="text-[10px] font-bold text-blue-200 uppercase tracking-widest mb-1">Webhook URL</p>
+            <div className="flex items-center justify-between">
+              <code className="text-xs font-mono truncate mr-2">https://{typeof window !== "undefined" ? window.location.host : "your-domain.com"}/api/social/webhook</code>
+              <button onClick={() => navigator.clipboard.writeText(`https://${window.location.host}/api/social/webhook`)} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
+                <Plus className="w-3.5 h-3.5 rotate-45" />
+              </button>
+            </div>
+          </div>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+            <p className="text-[10px] font-bold text-blue-200 uppercase tracking-widest mb-1">Verify Token</p>
+            <div className="flex items-center justify-between">
+              <code className="text-xs font-mono">aisalesos_secret_token</code>
+              <button onClick={() => navigator.clipboard.writeText("aisalesos_secret_token")} className="p-1.5 hover:bg-white/10 rounded-xl transition-colors">
+                <Plus className="w-3.5 h-3.5 rotate-45" />
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div className="mt-5 flex items-center gap-4">
+          <button className="text-xs font-bold bg-white text-blue-700 px-4 py-2 rounded-xl hover:bg-blue-50 transition-colors">
+            Setup Guide
+          </button>
+          <div className="flex -space-x-2">
+            {[Heart, Facebook, AtSign].map((Icon, i) => (
+              <div key={i} className="w-8 h-8 rounded-full bg-white/20 border-2 border-blue-600 flex items-center justify-center">
+                <Icon className="w-3.5 h-3.5 text-white" />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* New rule form */}
